@@ -1,0 +1,157 @@
+extends ../layouts/base
+
+block config
+  - active = 'results'
+
+block content
+  //- ---------- Дані ----------
+  - var columns = [{key: 'id', label: 'Респондент'}, {key: 'age', label: 'Вік, роки'}, {key: 'freq', label: 'Частота покупок'}, {key: 'channel', label: 'Канал'}, {key: 'sat', label: 'Задоволеність'}, {key: 'date', label: 'Дата відповіді'}]
+
+  - var filterDefs = [{id: 'gender', label: 'Стать', options: ['Жіноча', 'Чоловіча']}, {id: 'age', label: 'Вікова група', options: ['18–24', '25–34', '35–44', '45+', '65+']}, {id: 'freq', label: 'Частота покупок', options: ['Раз на тиждень', 'Кілька разів на тиждень', 'Кілька разів на місяць']}, {id: 'channel', label: 'Канал', options: ['Смартфон', 'Комп’ютер', 'Планшет']}, {id: 'sat', label: 'Задоволеність', options: [{value: '5', label: '5 із 5'}, {value: '4', label: '4 із 5'}, {value: '3', label: '3 із 5'}, {value: '2', label: '2 із 5'}, {value: '1', label: '1 із 5'}, {value: 'none', label: 'Без оцінки'}]}, {id: 'city', label: 'Місто', options: ['Київ', 'Львів', 'Одеса', 'Харків', 'Дніпро']}]
+
+  .page-header
+    .header-text
+      span.subtitle робочий простір
+      h1 Впорядкування результатів
+      p Знаходьте потрібні відповіді, створюйте групи та готуйте дані до аналізу.
+    button.btn-outline#export-btn(type="button")
+      +icon('download', 18)
+      span Експорт відповідей
+
+  //- Вибір опитування та коротка інформація
+  .survey-bar
+    +dropdown(['Звички онлайн-покупок 2026', 'Сприйняття бренду «Обрій»', 'Досвід доставки: осінь'])
+    .survey-meta
+      span.tag Активне
+      span#meta-count 486 відповідей · 12 запитань
+      button.link-btn#simulate(type="button")
+        +icon('refresh', 14)
+        span Імітувати нову відповідь
+
+  //- Ключові показники (рахуються зі списку відповідей)
+  section.kpi-grid
+    .kpi-card
+      span.kpi-label Завершені відповіді
+      strong.kpi-value#kpi-total 486
+    .kpi-card
+      span.kpi-label Нові за 7 днів
+      strong.kpi-value#kpi-new 124
+    .kpi-card
+      span.kpi-label Середній час
+      strong.kpi-value#kpi-time 4 хв 32 с
+
+  //- Таблиця відповідей
+  section.results-card
+    .toolbar
+      label.search-box
+        +icon('search', 20)
+        input#search(type="search" placeholder="Пошук за номером або змістом відповіді" autocomplete="off")
+      button.btn-accent#group-open(type="button")
+        +icon('scan', 20)
+        span Групувати відповіді
+      button.btn-line#filters-toggle(type="button" aria-expanded="false")
+        +icon('settings', 20)
+        span Фільтри
+
+    //- Панель фільтрів (вибір значень + діапазон дат)
+    .filters-panel#filters-panel(hidden)
+      each f in filterDefs
+        label
+          span= f.label
+          .select-wrap
+            select(id='f-' + f.id)
+              option(value="") Усі
+              each o in f.options
+                option(value=(o.value || o))= (o.label || o)
+            +icon('chevron-down', 18)
+      label
+        span Дата відповіді: від
+        input.text-input#f-from(type="date" min="2026-09-01" max="2026-12-31")
+      label
+        span до
+        input.text-input#f-to(type="date" min="2026-09-01" max="2026-12-31")
+      button.link-btn#filters-reset(type="button") Скинути фільтри
+      .form-error#date-error(hidden) Дата початку не може бути пізнішою за дату завершення
+
+    .chips-row
+      .chips#chips
+      .sort-controls
+        span.hint Shift + клік по заголовку — додатковий рівень сортування
+        button.link-btn#sort-reset(type="button" hidden) Скинути сортування
+        .select-wrap
+          select#sort-preset(aria-label="Сортування")
+            option(value="date-desc") Спочатку нові
+            option(value="date-asc") Спочатку старі
+            option(value="sat-desc") Задоволеність: від високої
+            option(value="sat-asc") Задоволеність: від низької
+            option(value="age-asc") Вік: за зростанням
+            option(value="custom" hidden disabled) Власне сортування
+          +icon('chevron-down', 18)
+
+    .table-wrap
+      table.results-table
+        thead
+          tr
+            each col in columns
+              th(data-sort=col.key aria-sort="none")
+                button.sort-btn(type="button")
+                  span= col.label
+                  span.sort-level
+        tbody#rows
+
+    .empty-state#empty-state(hidden) За даними критеріями відповідей не знайдено
+
+    .table-footer
+      span.shown#shown
+      nav.pagination#pagination(aria-label="Сторінки")
+
+  //- Розрахунковий скрипт
+  section.calc-card
+    .calc-head
+      h2.calc-title
+        +icon('calculator', 22)
+        span Швидкі розрахунки
+      p Показники рахуються миттєво за поточною вибіркою (з урахуванням фільтрів) і оновлюються при нових відповідях.
+    .calc-controls
+      label
+        span Запитання
+        .select-wrap
+          select#calc-question
+          +icon('chevron-down', 18)
+      label
+        span Показник
+        .select-wrap
+          select#calc-metric
+            option(value="mean") Середнє значення
+            option(value="median") Медіана
+            option(value="mode") Мода
+            option(value="std") Стандартне відхилення
+            option(value="percent") Відсоток від загальної кількості
+            option(value="count") Кількість відповідей
+          +icon('chevron-down', 18)
+      label#calc-value-wrap(hidden)
+        span Відповідь
+        .select-wrap
+          select#calc-value
+          +icon('chevron-down', 18)
+      button.btn-accent#calc-run(type="button") Розрахувати
+    .calc-note#calc-note
+    .calc-result#calc-result(aria-live="polite")
+
+  //- Вікно групування
+  dialog.modal#group-dialog
+    .modal-head
+      h2 Групування відповідей
+      button.icon-btn#group-close(type="button" aria-label="Закрити")
+        +icon('x', 22)
+    p.modal-text Однакові відповіді (без урахування регістру й зайвих пробілів) об’єднуються автоматично. Схожі за змістом можна згрупувати вручну. Групувати можна лише варіанти в межах одного запитання.
+    label.modal-field
+      span Запитання
+      .select-wrap
+        select#group-question
+        +icon('chevron-down', 18)
+    .group-list#group-list
+    .group-form
+      input.text-input#group-name(type="text" placeholder="Назва групи" maxlength="40")
+      button.btn-accent#group-create(type="button") Згрупувати
+    .form-error#group-error(hidden)

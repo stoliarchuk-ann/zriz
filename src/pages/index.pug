@@ -1,0 +1,78 @@
+extends ../layouts/base
+
+block config
+  - active = 'dashboard'
+
+block content
+  //- Міксін: рядок таблиці опитувань
+  mixin survey-row(s)
+    tr
+      td
+        b= s.name
+        if s.sub
+          br
+          span.sub= s.sub
+      td
+        span.status-active= s.status
+      td= s.answers
+      td= s.conv
+      td= s.updated
+
+  //- ---------- Дані ----------
+  - var stats = [{title: 'Активних', value: '5', badge: '+2 за місяць', up: false, desc: 'Опитувань збирають відповіді'}, {title: 'Нових', value: '124', badge: '18,4%', up: true, desc: 'Відповідей за останні 7 днів'}, {title: 'Конверсія', value: '80%', badge: '6,2 в. п.', up: true, desc: 'Відкриття → завершена відповідь'}]
+
+  - var surveys = [{name: 'Звички онлайн-покупок 2026', sub: 'Споживча поведінка · 12 запитань', status: 'Активне', answers: 486, conv: '80%', updated: 'Сьогодні, 10:42'}, {name: 'Сприйняття бренду «Обрій»', status: 'Активне', answers: 352, conv: '76%', updated: 'Сьогодні, 09:18'}, {name: 'Досвід доставки: осінь', status: 'Активне', answers: 214, conv: '84%', updated: '22 жовт., 17:30'}]
+
+  //- Накопичувальні відповіді, точка кожні 2 дні (01, 03 ... 23 жовтня)
+  - var octData = [600, 655, 735, 810, 890, 950, 1005, 1090, 1130, 1165, 1215, 1248]
+  - var sepData = [455, 505, 535, 610, 645, 735, 810, 825, 860, 920, 995, 1065]
+  - var yLabels = ['1 600', '1 200', '800', '400', '0']
+  - var xLabels = ['01 жовт.', '05 жовт.', '09 жовт.', '13 жовт.', '17 жовт.', '21 жовт.', '23 жовт.']
+
+  .page-header
+    .header-text
+      span.subtitle робочий простір
+      h1 Дашборд
+      p Вітаємо, Олено. Ось як розвиваються ваші дослідження.
+    button.btn-primary(type="button")
+      +icon('plus', 18)
+      span Створити опитування
+
+  section.stats-grid
+    each item in stats
+      +stat-card(item)
+
+  section.chart-section
+    .chart-header
+      div
+        h2 Динаміка відповідей
+        p.chart-desc Накопичувальні відповіді у всіх дослідженнях
+      button.date-picker(type="button")
+        span 01–23 жовтня 2026
+        +icon('chevron-down', 18)
+
+    .chart-legend
+      span.legend-item.current Жовтень
+      span.legend-item.prev Вересень
+
+    +area-chart(octData, sepData, 1600, yLabels, xLabels)
+
+  section.table-section
+    .table-header
+      h2 Опитування у фокусі
+      a.link-all(href="#")
+        span Усі дослідження
+        +icon('arrow-right', 16)
+
+    .table-wrap
+      table.surveys-table
+        thead
+          tr
+            th Назва
+            th Статус
+            th Відповіді
+            th Конверсія
+            th Оновлено
+        tbody
+          each s in surveys
+            +survey-row(s)

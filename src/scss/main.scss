@@ -1,0 +1,979 @@
+// Шрифт Inter (як у макеті Figma), з кирилицею
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+// --- ЗМІННІ (кольори знято з макету) ---
+$bg-main: #12090B;      // тло сторінки
+$bg-content: #160C0F;   // шапка таблиці
+$bg-panel: #1C1013;     // верхня панель, бокове меню, картки
+$bg-surface: #25161B;   // аватар команди, блок «ПРО»
+$border-color: #38232A;
+$border-inner: #2A191E; // внутрішня тонка рамка карток
+$badge-bg: #3C1D29;
+$badge-solid: #94505F;  // заливка бейджів (+2 за місяць, Активне, ПРО)
+$accent-pink: #E55B7B;
+$text-light: #F5E6E8;
+$text-dimmed: #937B83;
+$text-muted: #BDA5AC;
+
+// --- РОЗМІРИ ---
+$header-height: 95px;
+$sidebar-width: 305px;
+$page-max-width: 1800px;
+$chart-height: 215px;
+
+// --- БРЕЙКПОІНТИ ---
+$bp-tablet: 1200px;
+$bp-mobile: 768px;
+
+@import "mixins";
+
+// --- МІКСИНИ ---
+
+// Flex-контейнер з параметрами
+@mixin flex($justify: flex-start, $align: center, $gap: 0) {
+  display: flex;
+  justify-content: $justify;
+  align-items: $align;
+  gap: $gap;
+}
+
+// Картка з рамкою та внутрішнім кільцем, як у макеті
+@mixin card($radius: 16px) {
+  background-color: $bg-panel;
+  border: 1px solid $border-color;
+  box-shadow: inset 0 0 0 1px $border-inner;
+  border-radius: $radius;
+}
+
+// Адаптивність
+@mixin respond($max-width) {
+  @media (max-width: $max-width) {
+    @content;
+  }
+}
+
+// Спільні стилі для бейджів (@extend)
+%pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 6px;
+  background-color: $badge-solid;
+  color: $text-light;
+  font-size: 14px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+// --- БАЗОВІ СТИЛІ ---
+*, *::before, *::after { box-sizing: border-box; }
+
+html { background-color: #000; } // чорні поля навколо макету 1800px, як у Figma
+
+body {
+  margin: 0;
+  background-color: $bg-main;
+  color: $text-light;
+  font-family: "Inter", -apple-system, "Segoe UI", sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, p { margin: 0; }
+button { font-family: inherit; cursor: pointer; }
+.icon { flex-shrink: 0; }
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  max-width: $page-max-width;
+  min-height: 100vh;
+  margin: 0 auto;
+  background-color: $bg-main;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+}
+
+// --- ВЕРХНЯ ПАНЕЛЬ ---
+.top-nav {
+  display: flex;
+  align-items: stretch;
+  height: $header-height;
+  background-color: $bg-panel;
+  border-bottom: 1px solid $border-color;
+
+  .logo {
+    @include flex(flex-start, center);
+    width: $sidebar-width;
+    padding-left: 40px;
+    font-size: 32px;
+    font-weight: 400;
+    color: $text-light;
+
+    .logo-bars {
+      @include flex(flex-start, flex-end, 3px);
+      height: 31px;
+      margin-right: 22px;
+
+      .bar { width: 7px; background-color: $accent-pink; border-radius: 3px; }
+
+      // висоти стовпчиків логотипу
+      @each $i, $h in (1: 20px, 2: 31px, 3: 25px) {
+        .bar-#{$i} { height: $h; }
+      }
+    }
+  }
+
+  .tabs {
+    @include flex(flex-start, stretch, 40px);
+
+    a {
+      display: flex;
+      align-items: center;
+      color: $text-muted;
+      text-decoration: none;
+      font-size: 16px;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s;
+
+      &:hover { color: $text-light; }
+
+      &.active {
+        color: $text-light;
+        font-weight: 500;
+        border-bottom-color: $accent-pink;
+      }
+    }
+  }
+
+  .user-profile {
+    @include flex(flex-end, center, 26px);
+    margin-left: auto;
+    padding-right: 40px;
+
+    .icon-btn {
+      display: flex;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: $text-muted;
+      transition: color 0.2s;
+      &:hover { color: $text-light; }
+    }
+
+    .user-divider { width: 1px; height: 31px; background-color: $border-color; }
+
+    .user-name {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.35;
+      small { color: $text-dimmed; font-size: 12px; font-weight: 400; }
+    }
+
+    .avatar {
+      @include flex(center, center);
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background-color: $badge-bg;
+      color: $accent-pink;
+    }
+  }
+}
+
+// --- БОКОВЕ МЕНЮ ---
+.sidebar {
+  @include flex(space-between, stretch);
+  flex-direction: column;
+  flex-shrink: 0;
+  width: $sidebar-width;
+  padding: 30px 20px 20px;
+  background-color: $bg-panel;
+  border-right: 1px solid $border-color;
+}
+
+.team-selector {
+  @include flex(flex-start, center, 12px);
+  height: 72px;
+  padding: 0 15px;
+  margin-bottom: 38px;
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  cursor: pointer;
+
+  .team-avatar {
+    @include flex(center, center);
+    width: 38px;
+    height: 38px;
+    background-color: $bg-surface;
+    color: $text-light;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .team-info { flex: 1; line-height: 1.3; }
+  .team-name { font-size: 14px; font-weight: 500; color: $text-light; }
+  .team-role { font-size: 12px; color: $text-dimmed; }
+  .team-caret { color: $text-muted; }
+}
+
+.menu-title {
+  padding-left: 15px;
+  margin-bottom: 16px;
+  color: $text-dimmed;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.menu-item {
+  @include flex(flex-start, center, 11px);
+  height: 55px;
+  padding: 0 17px;
+  margin-bottom: 7px;
+  border-radius: 10px;
+  color: $text-muted;
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.2s;
+
+  &:hover { color: $text-light; }
+
+  &.active {
+    background-color: $badge-bg;
+    color: $accent-pink;
+  }
+}
+
+.sidebar-bottom {
+  .menu-item {
+    height: 43px;
+    padding: 0 2px;
+    margin-bottom: 0;
+    gap: 13px;
+  }
+}
+
+.pro-block {
+  padding: 17px;
+  margin-bottom: 20px;
+  background-color: $bg-surface;
+  border-radius: 12px;
+
+  .pro-header { @include flex(space-between, center); margin-bottom: 14px; }
+  .pro-title { font-weight: 500; font-size: 14px; color: $text-light; }
+  .pro-badge {
+    @extend %pill;
+    height: 30px;
+    padding: 0 13px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .pro-stats { margin-bottom: 14px; color: $text-muted; font-size: 12.5px; }
+  .progress-bar { height: 4px; margin-bottom: 14px; background-color: $badge-bg; border-radius: 2px; }
+  .progress-fill { height: 100%; background-color: $accent-pink; border-radius: 2px; }
+  .pro-limit { color: $text-dimmed; font-size: 12.5px; }
+}
+
+// --- ОСНОВНА ЧАСТИНА ---
+.main-content {
+  flex: 1;
+  min-width: 0;
+  padding: 46px 45px 32px;
+}
+
+// Заголовок сторінки
+.page-header {
+  @include flex(space-between, center);
+  margin-bottom: 30px;
+
+  .subtitle {
+    display: block;
+    margin-bottom: 22px;
+    color: $text-dimmed;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  h1 { margin-bottom: 8px; font-size: 40px; font-weight: 500; line-height: 48px; }
+  p { color: $text-muted; font-size: 16px; line-height: 24px; }
+
+  .btn-primary {
+    @include btn-style($accent-pink);
+    @include flex(center, center, 14px);
+    min-width: 252px;
+    height: 55px;
+    margin-top: 29px; // у макеті кнопка трохи нижче центру блоку з текстом
+    padding: 0 26px;
+    border: none;
+    border-radius: 10px;
+    background-color: $accent-pink;
+    color: $bg-main;
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+
+// Картки статистики
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+  margin-bottom: 31px;
+
+  .stat-card {
+    @include card();
+    position: relative;
+    padding: 28px 27px;
+
+    .card-header { margin-bottom: 29px; }
+    h3 { font-size: 16px; font-weight: 500; line-height: 20px; color: $text-muted; }
+
+    .arrow { position: absolute; top: 28px; right: 27px; color: $text-muted; }
+
+    .value-row { @include flex(flex-start, center, 20px); margin-bottom: 26px; }
+    .value { font-size: 48px; font-weight: 300; line-height: 48px; letter-spacing: -1px; }
+
+    .badge { @extend %pill; }
+
+    .desc { color: $text-dimmed; font-size: 14px; line-height: 20px; }
+  }
+}
+
+// Секція графіка
+.chart-section {
+  @include card();
+  padding: 32px 30px 30px;
+  margin-bottom: 30px;
+
+  .chart-header { @include flex(space-between, center); }
+  h2 { font-size: 22px; font-weight: 600; line-height: 28px; }
+  .chart-desc { margin-top: 7px; color: $text-dimmed; font-size: 14px; line-height: 20px; }
+
+  .date-picker {
+    @include flex(center, center, 12px);
+    height: 50px;
+    padding: 0 16px;
+    border: 1px solid $border-color;
+    border-radius: 10px;
+    background: transparent;
+    color: $text-light;
+    font-size: 15px;
+    font-weight: 500;
+    .icon { color: $text-muted; }
+  }
+
+  // Легенда
+  .chart-legend { @include flex(flex-start, center, 28px); margin: 26px 0 29px; }
+  .legend-item {
+    @include flex(flex-start, center, 9px);
+    color: $text-muted;
+    font-size: 14px;
+    line-height: 16px;
+
+    &::before { content: ""; width: 20px; height: 3px; border-radius: 2px; }
+    &.current::before { background-color: $accent-pink; }
+    &.prev::before { background-color: $badge-solid; }
+  }
+
+  // Графік
+  .chart-body { display: flex; }
+  .y-axis {
+    @include flex(space-between, flex-start);
+    flex-direction: column;
+    width: 60px;
+    height: $chart-height;
+    color: $text-dimmed;
+    font-size: 13px;
+    line-height: 14px;
+  }
+  .plot { flex: 1; height: $chart-height; }
+  .chart-svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+  .grid-line { stroke: $border-color; stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .line {
+    fill: none;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .line-curr { stroke: $accent-pink; stroke-width: 3; }
+  .line-prev { stroke: $badge-solid; stroke-width: 2.5; }
+
+  .x-axis {
+    @include flex(space-between, center);
+    margin: 15px 0 0 60px;
+    color: $text-dimmed;
+    font-size: 13px;
+    line-height: 16px;
+  }
+}
+
+// Таблиця
+.table-section {
+  @include card();
+  padding: 24px;
+  margin-bottom: 32px;
+
+  .table-header { @include flex(space-between, center); margin-bottom: 21px; }
+  h2 { font-size: 22px; font-weight: 600; line-height: 28px; }
+
+  .link-all {
+    @include flex(flex-end, center, 8px);
+    color: $accent-pink;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .table-wrap { overflow-x: auto; }
+
+  .surveys-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    text-align: left;
+
+    th {
+      height: 56px;
+      padding: 0 20px;
+      background-color: $bg-content;
+      color: $text-dimmed;
+      font-size: 13px;
+      font-weight: 400;
+
+      &:first-child { border-radius: 10px 0 0 10px; }
+      &:last-child { border-radius: 0 10px 10px 0; }
+
+      // ширини колонок, як у макеті
+      &:nth-child(1) { width: 38.7%; }
+      &:nth-child(2) { width: 16.6%; }
+      &:nth-child(3) { width: 12.9%; }
+      &:nth-child(4) { width: 12.9%; }
+      &:nth-child(5) { width: 18.9%; }
+    }
+
+    td {
+      height: 77px;
+      padding: 0 20px;
+      border-bottom: 1px solid $border-color;
+      color: $text-muted;
+      font-size: 15px;
+      vertical-align: middle;
+    }
+
+    b { color: $text-light; font-weight: 500; }
+    .sub { display: inline-block; margin-top: 4px; color: $text-dimmed; font-size: 12.5px; line-height: 16px; }
+    .status-active { @extend %pill; }
+  }
+}
+
+// Підвал сторінки
+.page-footer {
+  @include flex(space-between, center);
+  color: $text-dimmed;
+  font-size: 12.5px;
+  line-height: 16px;
+
+  .footer-left { @include flex(flex-start, center, 8px); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background-color: $accent-pink; }
+}
+
+// --- СТОРІНКА «АНАЛІЗ ТРЕНДІВ» ---
+
+// Кнопка з рамкою (Експорт PDF)
+.page-header .btn-outline {
+  @include flex(center, center, 10px);
+  height: 54px;
+  margin-top: 32px;
+  padding: 0 24px;
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  background: transparent;
+  color: $text-light;
+  font-size: 15px;
+  font-weight: 500;
+  transition: border-color 0.2s;
+  &:hover { border-color: $accent-pink; }
+}
+
+// Панель фільтрів
+.filters-bar {
+  @include flex(space-between, center);
+  margin-bottom: 32px;
+
+  .filters { @include flex(flex-start, center, 14px); flex-wrap: wrap; }
+  .sample-info { color: $text-dimmed; font-size: 13px; }
+}
+
+// Кнопка-список (вибір опитування, фільтри)
+.select-btn {
+  @include flex(center, center, 14px);
+  height: 48px;
+  padding: 0 18px;
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  background-color: $bg-panel;
+  color: $text-light;
+  font-size: 15px;
+  transition: border-color 0.2s;
+  &:hover { border-color: $accent-pink; }
+  .icon { color: $text-muted; }
+}
+
+// Випадаючий список (кнопка + меню), логіка в src/dropdown.js
+.dropdown {
+  position: relative;
+  display: inline-block;
+
+  &.open > button { border-color: $accent-pink; .icon { transform: rotate(180deg); } }
+  .icon { transition: transform 0.2s; }
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  min-width: 100%;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  background-color: $bg-panel;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+
+  li {
+    padding: 10px 14px;
+    border-radius: 8px;
+    color: $text-muted;
+    font-size: 14px;
+    white-space: nowrap;
+    cursor: pointer;
+    &:hover, &:focus { outline: none; background-color: $badge-bg; color: $text-light; }
+    &.selected { background-color: rgba(229, 91, 123, 0.12); color: $accent-pink; }
+  }
+}
+
+// Меню біля правого краю картки відкривається вліво
+.chart-header .dropdown-menu { left: auto; right: 0; }
+
+// Вищий графік (100% по осі Y)
+.chart-section--tall {
+  .y-axis, .plot { height: 280px; }
+}
+
+// Блоки висновків
+.insights {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+
+  .insight-card {
+    @include card();
+    padding: 28px 30px;
+
+    .insight-header { @include flex(space-between, center); margin-bottom: 16px; }
+    .insight-title {
+      @include flex(flex-start, center, 12px);
+      font-size: 18px;
+      font-weight: 600;
+      .icon { color: $accent-pink; }
+    }
+    .tag { @extend %pill; height: 32px; font-size: 13px; }
+
+    p { color: $text-muted; font-size: 15px; line-height: 24px; }
+
+    .insight-link {
+      @include flex(flex-start, center, 8px);
+      margin-top: 20px;
+      color: $accent-pink;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .insight-note { margin-top: 20px; color: $text-dimmed; font-size: 12.5px; }
+  }
+}
+
+// --- СТОРІНКА «ВПОРЯДКУВАННЯ РЕЗУЛЬТАТІВ» ---
+[hidden] { display: none !important; }
+
+// Кнопки
+.btn-accent {
+  @include flex(center, center, 10px);
+  height: 52px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 10px;
+  background-color: $accent-pink;
+  color: $bg-main;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: filter 0.2s;
+  &:hover { filter: brightness(1.08); }
+}
+
+.btn-line {
+  @include flex(center, center, 10px);
+  height: 52px;
+  padding: 0 22px;
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  background: transparent;
+  color: $text-light;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: border-color 0.2s;
+  &:hover, &[aria-expanded="true"] { border-color: $accent-pink; }
+}
+
+.link-btn {
+  @include flex(flex-start, center, 6px);
+  padding: 0;
+  border: none;
+  background: none;
+  color: $accent-pink;
+  font-size: 13px;
+  font-weight: 500;
+  &:hover { text-decoration: underline; }
+}
+
+// Випадаючий список зі стрілкою
+.select-wrap {
+  position: relative;
+  display: inline-flex;
+
+  select {
+    appearance: none;
+    height: 48px;
+    padding: 0 46px 0 18px;
+    border: 1px solid $border-color;
+    border-radius: 10px;
+    background-color: $bg-panel;
+    color: $text-light;
+    font-family: inherit;
+    font-size: 15px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    &:hover, &:focus-visible { border-color: $accent-pink; outline: none; }
+    option { background-color: $bg-panel; color: $text-light; }
+  }
+  .icon { position: absolute; top: 50%; right: 16px; transform: translateY(-50%); color: $text-muted; pointer-events: none; }
+}
+
+.tag { @extend %pill; height: 32px; font-size: 13px; }
+
+// Вибір опитування
+.survey-bar {
+  @include flex(space-between, center);
+  margin-bottom: 30px;
+  .survey-meta { @include flex(flex-end, center, 16px); color: $text-muted; font-size: 14px; }
+}
+
+// Ключові показники
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+  margin-bottom: 32px;
+
+  .kpi-card {
+    @include card();
+    @include flex(space-between, center);
+    height: 90px;
+    padding: 0 28px;
+  }
+  .kpi-label { color: $text-muted; font-size: 15px; }
+  .kpi-value { font-size: 36px; font-weight: 400; letter-spacing: -0.5px; }
+}
+
+// Картка з таблицею
+.results-card {
+  @include card();
+  padding: 24px;
+  margin-bottom: 30px;
+
+  .toolbar { @include flex(flex-start, center, 15px); }
+  .search-box {
+    @include flex(flex-start, center, 12px);
+    flex: 1;
+    height: 52px;
+    padding: 0 18px;
+    border: 1px solid $border-color;
+    border-radius: 10px;
+    color: $text-dimmed;
+    transition: border-color 0.2s;
+    &:focus-within { border-color: $accent-pink; }
+    input {
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: none;
+      color: $text-light;
+      font-family: inherit;
+      font-size: 15px;
+      &::placeholder { color: $text-dimmed; }
+    }
+  }
+
+  .filters-panel {
+    @include flex(flex-start, flex-end, 16px);
+    flex-wrap: wrap;
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    background-color: $bg-main;
+    label { display: flex; flex-direction: column; gap: 6px; color: $text-dimmed; font-size: 12.5px; }
+    .link-btn { height: 48px; }
+    .text-input { width: 180px; color-scheme: dark; }
+    .form-error { flex-basis: 100%; margin-top: 0; }
+  }
+
+  .chips-row { @include flex(space-between, center); margin: 18px 0 20px; gap: 16px; flex-wrap: wrap; }
+  .chips { @include flex(flex-start, center, 10px); flex-wrap: wrap; }
+  .chip {
+    @include flex(flex-start, center, 8px);
+    height: 30px;
+    padding: 0 12px;
+    border-radius: 6px;
+    background-color: $badge-bg;
+    color: $text-light;
+    font-size: 12.5px;
+    button { padding: 0; border: none; background: none; color: $text-muted; font-size: 16px; line-height: 1; &:hover { color: $accent-pink; } }
+  }
+  .sort-controls { @include flex(flex-end, center, 16px); flex-wrap: wrap; .hint { color: $text-dimmed; font-size: 12px; } }
+
+  .table-wrap { overflow-x: auto; }
+  .results-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    text-align: left;
+
+    th {
+      height: 52px;
+      padding: 0 20px;
+      background-color: $bg-content;
+      color: $text-dimmed;
+      font-size: 13px;
+      font-weight: 400;
+      &:first-child { border-radius: 10px 0 0 10px; }
+      &:last-child { border-radius: 0 10px 10px 0; }
+      &:nth-child(1) { width: 16%; }
+      &:nth-child(2) { width: 9%; }
+      &:nth-child(3) { width: 22%; }
+      &:nth-child(4) { width: 15%; }
+      &:nth-child(5) { width: 14%; }
+      &:nth-child(6) { width: 24%; }
+    }
+    .sort-btn {
+      @include flex(flex-start, center, 8px);
+      padding: 0;
+      border: none;
+      background: none;
+      color: inherit;
+      font: inherit;
+      white-space: nowrap;
+      &:hover { color: $text-light; }
+      &::after { content: ""; order: 2; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid currentColor; opacity: 0; }
+      .sort-level { order: 3; color: $accent-pink; font-size: 11px; font-weight: 600; }
+    }
+    th[aria-sort="ascending"] .sort-btn { color: $accent-pink; &::after { opacity: 1; border-top: none; border-bottom: 5px solid currentColor; } }
+    th[aria-sort="descending"] .sort-btn { color: $accent-pink; &::after { opacity: 1; } }
+
+    td {
+      height: 77px;
+      padding: 0 20px;
+      border-bottom: 1px solid $border-color;
+      color: $text-muted;
+      font-size: 15px;
+    }
+    tr.selected td { background-color: rgba(229, 91, 123, 0.05); }
+    tr.row-new td { animation: row-flash 2s ease-out; }
+    .sat { color: $accent-pink; font-size: 14px; }
+    .row-id { @include flex(flex-start, center, 12px); color: $text-light; font-weight: 500; cursor: pointer; }
+  }
+
+  .empty-state { padding: 56px 20px; border-bottom: 1px solid $border-color; color: $text-muted; font-size: 15px; text-align: center; }
+
+  .table-footer { @include flex(space-between, center); margin-top: 20px; gap: 16px; flex-wrap: wrap; }
+  .shown { color: $text-dimmed; font-size: 13px; }
+  .pagination { @include flex(flex-end, center, 6px); }
+  .page-btn {
+    min-width: 44px;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    background: transparent;
+    color: $text-light;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    &:hover:not(:disabled):not(.active) { border-color: $accent-pink; }
+    &.active { border-color: $accent-pink; background-color: $accent-pink; color: $bg-main; }
+    &:disabled { opacity: 0.4; cursor: default; }
+  }
+  .page-gap { padding: 0 4px; color: $text-dimmed; }
+}
+
+@keyframes row-flash {
+  from { background-color: rgba(229, 91, 123, 0.22); }
+  to { background-color: transparent; }
+}
+
+// Чекбокс у стилі макету
+.row-check {
+  appearance: none;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 1.5px solid #B54864;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  &:checked { border-color: $accent-pink; background-color: $accent-pink; box-shadow: inset 0 0 0 3px $bg-panel; }
+}
+
+// Розрахунковий скрипт
+.calc-card {
+  @include card();
+  padding: 28px 30px;
+  margin-bottom: 32px;
+
+  .calc-title { @include flex(flex-start, center, 12px); font-size: 22px; font-weight: 600; line-height: 28px; .icon { color: $accent-pink; } }
+  .calc-head p { margin-top: 8px; color: $text-dimmed; font-size: 14px; line-height: 20px; }
+  .calc-controls {
+    @include flex(flex-start, flex-end, 16px);
+    flex-wrap: wrap;
+    margin-top: 22px;
+    label { display: flex; flex-direction: column; gap: 6px; color: $text-dimmed; font-size: 12.5px; }
+  }
+  .calc-controls .btn-accent { height: 48px; }
+  .calc-note { margin-top: 12px; color: $text-dimmed; font-size: 12.5px; &:empty { display: none; } }
+
+  .calc-result {
+    margin-top: 20px;
+    &:empty { display: none; }
+    strong { display: block; font-size: 40px; font-weight: 300; line-height: 48px; letter-spacing: -1px; }
+    span { color: $text-muted; font-size: 14px; }
+    &.updated strong { color: $accent-pink; }
+    &.error { padding: 14px 18px; border-radius: 10px; background-color: rgba(229, 91, 123, 0.1); color: $accent-pink; font-size: 14px; }
+  }
+}
+
+// Модальне вікно групування
+.modal {
+  width: min(680px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  padding: 28px;
+  border: 1px solid $border-color;
+  border-radius: 16px;
+  background-color: $bg-panel;
+  color: $text-light;
+  &::backdrop { background: rgba(0, 0, 0, 0.65); }
+
+  .modal-head { @include flex(space-between, center); h2 { font-size: 22px; font-weight: 600; } }
+  .icon-btn { display: flex; padding: 0; border: none; background: none; color: $text-muted; &:hover { color: $text-light; } }
+  .modal-text { margin: 10px 0 20px; color: $text-dimmed; font-size: 13.5px; line-height: 20px; }
+  .modal-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; color: $text-dimmed; font-size: 12.5px; .select-wrap { align-self: stretch; select { width: 100%; } } }
+
+  .group-list { max-height: 300px; overflow-y: auto; margin-bottom: 18px; }
+  .group-item {
+    display: grid;
+    grid-template-columns: 24px 1fr 50px 64px 100px;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    &:hover { background-color: $bg-surface; }
+  }
+  .group-label { display: flex; flex-direction: column; gap: 6px; cursor: pointer; font-size: 14px; }
+  .group-bar { height: 4px; border-radius: 2px; background-color: $badge-bg; i { display: block; height: 100%; border-radius: 2px; background-color: $accent-pink; } }
+  .group-count { color: $text-muted; font-size: 14px; text-align: right; }
+  .group-pct { color: $text-dimmed; font-size: 13px; text-align: right; }
+  .tag-mini { margin-left: 6px; padding: 2px 6px; border-radius: 4px; background-color: $badge-solid; font-size: 11px; font-style: normal; }
+
+  .group-form { @include flex(flex-start, center, 12px); .text-input { flex: 1; } }
+  .form-error { margin-top: 10px; color: #FF7A7A; font-size: 13px; }
+}
+
+.text-input {
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  background-color: $bg-main;
+  color: $text-light;
+  font-family: inherit;
+  font-size: 15px;
+  &:focus { border-color: $accent-pink; outline: none; }
+  &.invalid { border-color: #FF5A5A; box-shadow: 0 0 0 3px rgba(255, 90, 90, 0.18); }
+}
+
+// --- АДАПТИВНІСТЬ ---
+@include respond($bp-tablet) {
+  .sidebar { width: 260px; }
+  .top-nav .logo { width: 260px; padding-left: 28px; }
+  .main-content { padding: 36px 28px 28px; }
+  .stats-grid { gap: 16px; .value { font-size: 40px; } }
+}
+
+@include respond($bp-mobile) {
+  .top-nav {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 16px 20px 0;
+
+    .logo { width: auto; padding-left: 0; font-size: 26px; }
+    .user-profile { padding-right: 0; gap: 14px; .user-name { display: none; } }
+    .tabs { order: 3; width: 100%; gap: 24px; margin-top: 12px; overflow-x: auto; a { height: 44px; white-space: nowrap; } }
+  }
+
+  .app-body { flex-direction: column; }
+  .sidebar { width: 100%; border-right: none; border-bottom: 1px solid $border-color; padding: 20px; }
+  .main-content { padding: 24px 20px; }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 20px;
+    h1 { font-size: 32px; }
+    .btn-primary { width: 100%; margin-top: 0; }
+  }
+
+  .stats-grid { grid-template-columns: 1fr; }
+  .insights { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: 1fr; }
+  .survey-bar { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .results-card { padding: 16px; .toolbar { flex-wrap: wrap; } .search-box { flex-basis: 100%; } .results-table { min-width: 720px; } }
+  .modal .group-item { grid-template-columns: 24px 1fr 40px 54px; .link-btn { grid-column: 2 / -1; } }
+  .filters-bar { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .page-header .btn-outline { width: 100%; margin-top: 0; }
+  .chart-section--tall { .y-axis, .plot { height: 200px; } }
+  .chart-section { padding: 20px 16px; .chart-header { align-items: flex-start; flex-direction: column; gap: 16px; } }
+  .table-section .surveys-table { min-width: 640px; }
+  .page-footer { flex-direction: column; align-items: flex-start; gap: 8px; }
+}

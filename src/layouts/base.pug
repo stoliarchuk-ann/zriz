@@ -1,0 +1,76 @@
+//- Спільний шаблон: верхня панель, бокове меню, підвал
+include ../components/mixins
+
+//- ---------- Дані навігації ----------
+- var tabs = [{label: 'Дашборд', page: 'dashboard', href: 'index.html'}, {label: 'Мої опитування'}, {label: 'Респонденти'}]
+
+- var menu = [{label: 'Дашборд', icon: 'grid', page: 'dashboard', href: 'index.html'}, {label: 'Мої дослідження', icon: 'folders'}, {label: 'Конструктор', icon: 'edit'}, {label: 'Аналіз трендів', icon: 'trends', page: 'trends', href: 'trends.html'}, {label: 'Аналіз сегментів', icon: 'segments'}, {label: 'Впорядкування результатів', icon: 'sort', page: 'results', href: 'results.html'}, {label: 'Формування звітності', icon: 'report'}, {label: 'Відкриті опитування', icon: 'globe'}]
+
+//- Ліміт відповідей (для смужки прогресу)
+- var used = 1248, limit = 5000
+
+//- Активна сторінка; у кожній сторінці перевизначається у block config
+- var active = ''
+block config
+
+.app-container
+  header.top-nav
+    .logo
+      .logo-bars
+        span.bar.bar-1
+        span.bar.bar-2
+        span.bar.bar-3
+      span Зріз
+
+    nav.tabs
+      each tab in tabs
+        a(href=tab.href || '#' class=(tab.page && tab.page === active) ? 'active' : '')= tab.label
+
+    .user-profile
+      button.icon-btn(type="button" aria-label="Сповіщення")
+        +icon('bell', 22)
+      .user-divider
+      .user-name
+        span Олена Коваль
+        small Команда «Обрій»
+      .avatar
+        +icon('user', 20)
+
+  .app-body
+    aside.sidebar
+      .sidebar-top
+        .team-selector
+          .team-avatar О
+          .team-info
+            .team-name Команда «Обрій»
+            .team-role Дослідницька команда
+          +icon('chevrons-up-down', 18).team-caret
+
+        nav.menu
+          p.menu-title дослідження
+          each item in menu
+            +menu-item(item.label, item.icon, item.page && item.page === active, item.href)
+
+      .sidebar-bottom
+        .pro-block
+          .pro-header
+            span.pro-title Ваш простір зростає
+            span.pro-badge ПРО
+          .pro-stats 1 248 із 5 000 відповідей
+          .progress-bar
+            .progress-fill(style=`width: ${(used / limit * 100).toFixed(0)}%`)
+          .pro-limit Оновлення ліміту: 01 листопада
+
+        nav.menu
+          +menu-item('Особистий профіль', 'settings')
+          +menu-item('Центр допомоги', 'help')
+
+    main.main-content
+      block content
+
+      block footer
+        footer.page-footer
+          .footer-left
+            span.dot
+            span Дані оновлено сьогодні о 10:42
+          .footer-right Зріз · Рішення, підкріплені даними
