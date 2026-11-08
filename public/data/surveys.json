@@ -1,0 +1,23 @@
+[
+ {
+  "name": "Звички онлайн-покупок 2026",
+  "type": "quantitative",
+  "opened": 608,
+  "completed": 486,
+  "questions": 12
+ },
+ {
+  "name": "Сприйняття бренду «Обрій»",
+  "type": "qualitative",
+  "opened": 463,
+  "completed": 352,
+  "questions": 9
+ },
+ {
+  "name": "Досвід доставки: осінь",
+  "type": "quantitative",
+  "opened": 255,
+  "completed": 214,
+  "questions": 8
+ }
+]

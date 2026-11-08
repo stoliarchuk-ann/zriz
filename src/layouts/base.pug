@@ -15,6 +15,8 @@ block config
 
 .app-container
   header.top-nav
+    button.burger#menu-toggle(type="button" aria-label="Відкрити меню" aria-expanded="false" aria-controls="sidebar")
+      +icon('menu', 24)
     .logo
       .logo-bars
         span.bar.bar-1
@@ -37,14 +39,24 @@ block config
         +icon('user', 20)
 
   .app-body
-    aside.sidebar
+    aside.sidebar#sidebar
       .sidebar-top
+        button.sidebar-close#sidebar-close(type="button" aria-label="Закрити меню")
+          +icon('x', 22)
         .team-selector
           .team-avatar О
           .team-info
             .team-name Команда «Обрій»
             .team-role Дослідницька команда
           +icon('chevrons-up-down', 18).team-caret
+
+        //- Розділи верхньої панелі (показуються лише на вузьких екранах)
+        nav.menu.sidebar-tabs
+          p.menu-title розділи
+          each tab in tabs
+            if tab.page !== 'dashboard'
+              a.menu-item(href=tab.href || '#')
+                span= tab.label
 
         nav.menu
           p.menu-title дослідження
@@ -64,6 +76,8 @@ block config
         nav.menu
           +menu-item('Особистий профіль', 'settings')
           +menu-item('Центр допомоги', 'help')
+
+    .sidebar-backdrop#sidebar-backdrop
 
     main.main-content
       block content

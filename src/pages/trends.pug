@@ -4,59 +4,81 @@ block config
   - active = 'trends'
 
 block content
-  //- ---------- Дані ----------
-  - var filters = [['Звички онлайн-покупок 2026', 'Сприйняття бренду «Обрій»', 'Досвід доставки: осінь'], ['Травень — жовтень 2026', 'Квітень — вересень 2026', 'Останні 3 місяці', 'Останній рік'], ['Усі респонденти', 'Жінки', 'Чоловіки', '18–24', '25–34', '35–44', '45+']]
-
-  - var stats = [{title: 'Купують щотижня', value: '68%', badge: '12 в. п.', up: true, desc: 'Порівняно з травнем 2026'}, {title: 'Частка мобільних покупок', value: '74%', badge: '9 в. п.', up: true, desc: 'Найвищий показник за пів року'}, {title: 'Задоволені досвідом', value: '82%', badge: '7 в. п.', up: true, desc: 'Оцінки 4–5 за п’ятибальною шкалою'}]
-
-  //- Частка респондентів, % (12 точок)
-  - var online = [56, 57, 56, 59, 60, 62, 61, 64, 65, 67, 66, 68]
-  - var offline = [48, 47, 49, 46, 45, 47, 45, 44, 45, 43, 44, 42]
-  - var yLabels = ['100%', '75%', '50%', '25%', '0%']
-  - var xLabels = ['Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень']
+  //- ---------- Дані для списків ----------
+  - var surveys = ['Звички онлайн-покупок 2026', 'Сприйняття бренду «Обрій»', 'Досвід доставки: осінь']
+  - var periods = ['Травень — жовтень 2026', 'Останній рік', 'Останні 30 днів', 'Останні 7 днів', '1 день', 'Власний період']
+  - var segments = ['Усі респонденти', 'Жінки', 'Чоловіки', '18–24', '25–34', '35–44', '45+']
 
   .page-header
     .header-text
       span.subtitle робочий простір
       h1 Аналіз трендів
       p Відстежуйте зміни в поведінці аудиторії та знаходьте точки зростання.
-    button.btn-outline(type="button")
+    button.btn-outline#export-pdf(type="button")
       +icon('download', 18)
       span Експорт PDF
 
   //- Панель фільтрів
   .filters-bar
     .filters
-      each options in filters
-        +dropdown(options)
-    .sample-info Вибірка: 486 відповідей
+      +dropdown(surveys)(id="dd-survey")
+      +dropdown(periods)(id="dd-period")
+      +dropdown(segments)(id="dd-segment")
+    .sample-info#sample-info Вибірка: —
 
-  section.stats-grid
-    each item in stats
-      +stat-card(item)
+  //- Вибір періоду та порівняння
+  section.period-bar
+    .period-row
+      label
+        span Період: від
+        input.text-input#a-from(type="date")
+      label
+        span до
+        input.text-input#a-to(type="date")
+      label.check-label
+        input.row-check#cmp-toggle(type="checkbox")
+        span Порівняти з іншим періодом
+      button.btn-accent#apply(type="button") Застосувати
+    .period-row#cmp-row(hidden)
+      label
+        span Порівняти з: від
+        input.text-input#b-from(type="date")
+      label
+        span до
+        input.text-input#b-to(type="date")
+    .form-error#period-error(hidden)
+    .form-warning#period-warning(hidden)
+
+  //- Картки показників (малюються скриптом)
+  section.stats-grid#stats-grid
 
   section.chart-section.chart-section--tall
     .chart-header
       div
         h2 Частота онлайн-покупок
         p.chart-desc Частка респондентів, які купують щонайменше раз на тиждень
-      +dropdown(['За тижнями', 'За місяцями', 'За кварталами'], 'За місяцями', 'date-picker')
+      +dropdown(['За днями', 'За тижнями', 'За місяцями'], 'За місяцями', 'date-picker')(id="dd-gran")
 
-    .chart-legend
-      span.legend-item.current Покупки онлайн
-      span.legend-item.prev Покупки в магазинах
+    .chart-tools
+      .chart-legend#legend
+        span.legend-item.current Покупки онлайн
+        span.legend-item.prev Покупки в магазинах
+      .view-tabs#view-tabs(role="tablist" aria-label="Вигляд даних")
+        button.view-tab.active(type="button" data-mode="line" role="tab" aria-selected="true") Лінійний графік
+        button.view-tab(type="button" data-mode="bar" role="tab" aria-selected="false") Діаграма
+        button.view-tab(type="button" data-mode="table" role="tab" aria-selected="false") Таблиця
 
-    +area-chart(online, offline, 100, yLabels, xLabels)
+    #chart-mount
 
-  //- Висновки
+  //- Висновки (текст рахується скриптом)
   section.insights
     article.insight-card
       .insight-header
         h3.insight-title
           +icon('trending-up', 20)
-          span Звичка стає регулярною
+          span#ins-title Звичка стає регулярною
         span.tag Тренд
-      p За пів року частка щотижневих покупців зросла з 56% до 68%. Найшвидше зростає сегмент 25–34 роки.
+      p#ins-text
       a.insight-link(href="#")
         span Переглянути сегменти
         +icon('arrow-right', 16)
@@ -67,4 +89,4 @@ block content
           +icon('scan', 20)
           span Що варто перевірити
       p Мобільний досвід впливає на повторну покупку. Дослідіть зручність оформлення замовлення на смартфоні.
-      .insight-note Висновок на основі 486 відповідей
+      .insight-note#ins-note Висновок на основі — відповідей

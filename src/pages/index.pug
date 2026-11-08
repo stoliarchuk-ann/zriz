@@ -12,11 +12,11 @@ block content
         if s.sub
           br
           span.sub= s.sub
-      td
+      td(data-label="Статус")
         span.status-active= s.status
-      td= s.answers
-      td= s.conv
-      td= s.updated
+      td(data-label="Відповіді")= s.answers
+      td(data-label="Конверсія")= s.conv
+      td(data-label="Оновлено")= s.updated
 
   //- ---------- Дані ----------
   - var stats = [{title: 'Активних', value: '5', badge: '+2 за місяць', up: false, desc: 'Опитувань збирають відповіді'}, {title: 'Нових', value: '124', badge: '18,4%', up: true, desc: 'Відповідей за останні 7 днів'}, {title: 'Конверсія', value: '80%', badge: '6,2 в. п.', up: true, desc: 'Відкриття → завершена відповідь'}]

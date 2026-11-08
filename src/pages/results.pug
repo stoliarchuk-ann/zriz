@@ -5,9 +5,9 @@ block config
 
 block content
   //- ---------- Дані ----------
-  - var columns = [{key: 'id', label: 'Респондент'}, {key: 'age', label: 'Вік, роки'}, {key: 'freq', label: 'Частота покупок'}, {key: 'channel', label: 'Канал'}, {key: 'sat', label: 'Задоволеність'}, {key: 'date', label: 'Дата відповіді'}]
+  - var columns = [{key: 'id', label: 'Респондент'}, {key: 'name', label: 'Ім’я'}, {key: 'age', label: 'Вік, роки'}, {key: 'freq', label: 'Частота покупок'}, {key: 'channel', label: 'Канал'}, {key: 'sat', label: 'Задоволеність'}, {key: 'repeat', label: 'Повторна покупка'}, {key: 'date', label: 'Дата відповіді'}]
 
-  - var filterDefs = [{id: 'gender', label: 'Стать', options: ['Жіноча', 'Чоловіча']}, {id: 'age', label: 'Вікова група', options: ['18–24', '25–34', '35–44', '45+', '65+']}, {id: 'freq', label: 'Частота покупок', options: ['Раз на тиждень', 'Кілька разів на тиждень', 'Кілька разів на місяць']}, {id: 'channel', label: 'Канал', options: ['Смартфон', 'Комп’ютер', 'Планшет']}, {id: 'sat', label: 'Задоволеність', options: [{value: '5', label: '5 із 5'}, {value: '4', label: '4 із 5'}, {value: '3', label: '3 із 5'}, {value: '2', label: '2 із 5'}, {value: '1', label: '1 із 5'}, {value: 'none', label: 'Без оцінки'}]}, {id: 'city', label: 'Місто', options: ['Київ', 'Львів', 'Одеса', 'Харків', 'Дніпро']}]
+  - var filterDefs = [{id: 'gender', label: 'Стать', options: ['Жіноча', 'Чоловіча']}, {id: 'age', label: 'Вікова група', options: ['18–24', '25–34', '35–44', '45+', '65+']}, {id: 'freq', label: 'Частота покупок', options: ['Раз на тиждень', 'Кілька разів на тиждень', 'Кілька разів на місяць']}, {id: 'channel', label: 'Канал', options: ['Смартфон', 'Комп’ютер', 'Планшет']}, {id: 'sat', label: 'Задоволеність', options: [{value: '5', label: '5 із 5'}, {value: '4', label: '4 із 5'}, {value: '3', label: '3 із 5'}, {value: '2', label: '2 із 5'}, {value: '1', label: '1 із 5'}, {value: 'none', label: 'Без оцінки'}]}, {id: 'repeat', label: 'Повторна покупка', options: ['Так', 'Ні']}, {id: 'city', label: 'Місто', options: ['Київ', 'Львів', 'Одеса', 'Харків', 'Дніпро']}]
 
   .page-header
     .header-text
@@ -88,6 +88,7 @@ block content
             option(value="custom" hidden disabled) Власне сортування
           +icon('chevron-down', 18)
 
+    p.scroll-hint Гортайте таблицю вбік, щоб побачити всі колонки →
     .table-wrap
       table.results-table
         thead
@@ -113,7 +114,7 @@ block content
         span Швидкі розрахунки
       p Показники рахуються миттєво за поточною вибіркою (з урахуванням фільтрів) і оновлюються при нових відповідях.
     .calc-controls
-      label
+      label#calc-q-wrap
         span Запитання
         .select-wrap
           select#calc-question
@@ -128,6 +129,8 @@ block content
             option(value="std") Стандартне відхилення
             option(value="percent") Відсоток від загальної кількості
             option(value="count") Кількість відповідей
+            option(value="distribution") Відсотковий розподіл відповідей
+            option(value="conversion") Конверсія проходження опитування
           +icon('chevron-down', 18)
       label#calc-value-wrap(hidden)
         span Відповідь
@@ -144,12 +147,7 @@ block content
       h2 Групування відповідей
       button.icon-btn#group-close(type="button" aria-label="Закрити")
         +icon('x', 22)
-    p.modal-text Однакові відповіді (без урахування регістру й зайвих пробілів) об’єднуються автоматично. Схожі за змістом можна згрупувати вручну. Групувати можна лише варіанти в межах одного запитання.
-    label.modal-field
-      span Запитання
-      .select-wrap
-        select#group-question
-        +icon('chevron-down', 18)
+    p.modal-text Однакові відповіді (без урахування регістру й зайвих пробілів) об’єднуються автоматично. Схожі за змістом можна згрупувати вручну. Групувати можна лише варіанти відповідей на одне й те саме запитання.
     .group-list#group-list
     .group-form
       input.text-input#group-name(type="text" placeholder="Назва групи" maxlength="40")
